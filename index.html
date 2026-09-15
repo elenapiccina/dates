@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upcoming Events</title>
+    <title>Aesthetic Upcoming Events</title>
     <style>
         :root {
             --bg-color: #FAFAFA;
             --card-bg: #FFFFFF;
             --text-main: #2C2C2C;
             --text-muted: #888888;
-            --accent: #B8D6CD; /* Soft sage/teal accent */
-            --urgency: #E5B299; /* Soft warm tone for imminent dates */
+            --border-color: rgba(0, 0, 0, 0.06);
+
+            /* Tiered Countdown Colors */
+            --badge-future: #EFEFEF;  /* 8+ days */
+            --badge-week: #B8D6CD;    /* 4-7 days (Sage) */
+            --badge-soon: #F3D5A3;    /* 2-3 days (Amber) */
+            --badge-urgent: #E8C4B8;  /* Today / Tomorrow (Rose) */
         }
 
         body {
@@ -19,92 +24,337 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 16px;
+            padding: 20px;
         }
 
         .container {
-            max-width: 400px;
+            max-width: 750px;
             margin: 0 auto;
         }
 
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
         h3 {
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.05em;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin: 0;
+        }
+
+        .btn-add {
+            background: var(--text-main);
+            color: #FFFFFF;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-add:hover {
+            opacity: 0.85;
+        }
+
+        /* Form Modal */
+        .event-form {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .event-form.active {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        @media(max-width: 600px) {
+            .event-form.active {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .event-form input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .event-form button {
+            padding: 8px 14px;
+            background: #B8D6CD;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        /* List Layout */
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .event-card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            transition: transform 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .event-card:hover {
-            transform: translateY(-2px);
+        .event-card:active {
+            cursor: grabbing;
+        }
+
+        .event-card.dragging {
+            opacity: 0.4;
+            background: #f0f0f0;
         }
 
         .event-info {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .drag-handle {
+            color: #ccc;
+            font-size: 16px;
+            user-select: none;
         }
 
         .event-title {
             font-size: 14px;
             font-weight: 500;
-            margin-bottom: 4px;
         }
 
         .event-date {
             font-size: 12px;
             color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .event-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .countdown-badge {
-            background-color: var(--accent);
-            color: #2C2C2C;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
             white-space: nowrap;
+            color: var(--text-main);
         }
 
-        .urgent {
-            background-color: var(--urgency);
+        /* Dynamic Badge Classes */
+        .badge-tier-future { background-color: var(--badge-future); color: #666; }
+        .badge-tier-week { background-color: var(--badge-week); }
+        .badge-tier-soon { background-color: var(--badge-soon); }
+        .badge-tier-urgent { background-color: var(--badge-urgent); font-weight: 600; }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .btn-delete:hover {
+            color: #e57373;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 13px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h3>Upcoming Focus</h3>
-        
-        <div class="event-card">
-            <div class="event-info">
-                <span class="event-title">Project Deadline</span>
-                <span class="event-date">Oct 12, 2026</span>
-            </div>
-            <div class="countdown-badge urgent">In 2 days</div>
+        <div class="header-row">
+            <h3>Upcoming Focus & Dates</h3>
+            <button class="btn-add" onclick="toggleForm()">+ Add Event</button>
         </div>
 
-        <div class="event-card">
-            <div class="event-info">
-                <span class="event-title">Flight to Istanbul</span>
-                <span class="event-date">Oct 25, 2026</span>
-            </div>
-            <div class="countdown-badge">In 15 days</div>
+        <!-- Add Event Form -->
+        <div class="event-form" id="eventForm">
+            <input type="text" id="inputTitle" placeholder="Event title (e.g., Flight, Meeting)">
+            <input type="date" id="inputDate">
+            <button onclick="saveEvent()">Save Event</button>
         </div>
+
+        <!-- Events List Container -->
+        <div class="events-list" id="eventsList"></div>
     </div>
 
+    <script>
+        let events = JSON.parse(localStorage.getItem('notion_events')) || [
+            { id: '1', title: 'Project Deadline', date: '2026-10-12' },
+            { id: '2', title: 'Flight to Istanbul', date: '2026-10-25' }
+        ];
+
+        function saveToStorage() {
+            localStorage.setItem('notion_events', JSON.stringify(events));
+        }
+
+        function toggleForm() {
+            const form = document.getElementById('eventForm');
+            form.classList.toggle('active');
+        }
+
+        function getCountdownDetails(dateString) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const targetDate = new Date(dateString);
+            targetDate.setHours(0,0,0,0);
+            
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) return { text: 'Passed', class: 'badge-tier-future' };
+            if (diffDays === 0) return { text: 'Today', class: 'badge-tier-urgent' };
+            if (diffDays === 1) return { text: 'Tomorrow', class: 'badge-tier-urgent' };
+            if (diffDays <= 3) return { text: `In ${diffDays} days`, class: 'badge-tier-soon' };
+            if (diffDays <= 7) return { text: `In ${diffDays} days`, class: 'badge-tier-week' };
+            return { text: `In ${diffDays} days`, class: 'badge-tier-future' };
+        }
+
+        function formatDateReadable(dateString) {
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            const date = new Date(dateString);
+            return isNaN(date) ? dateString : date.toLocaleDateString('en-US', options);
+        }
+
+        function renderEvents() {
+            const listEl = document.getElementById('eventsList');
+            listEl.innerHTML = '';
+
+            if (events.length === 0) {
+                listEl.innerHTML = `<div class="empty-state">No upcoming events. Click "+ Add Event" to create one.</div>`;
+                return;
+            }
+
+            events.forEach((ev, index) => {
+                const countdown = getCountdownDetails(ev.date);
+                
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.draggable = true;
+                card.dataset.index = index;
+
+                card.innerHTML = `
+                    <div class="event-info">
+                        <span class="drag-handle">⋮⋮</span>
+                        <div>
+                            <div class="event-title">${escapeHtml(ev.title)}</div>
+                            <div class="event-date">${formatDateReadable(ev.date)}</div>
+                        </div>
+                    </div>
+                    <div class="event-right">
+                        <span class="countdown-badge ${countdown.class}">${countdown.text}</span>
+                        <button class="btn-delete" onclick="deleteEvent('${ev.id}')" title="Delete">×</button>
+                    </div>
+                `;
+
+                // Drag and drop events
+                card.addEventListener('dragstart', () => card.classList.add('dragging'));
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    saveToStorage();
+                });
+
+                card.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    const draggingCard = document.querySelector('.dragging');
+                    const siblings = [...listEl.querySelectorAll('.event-card:not(.dragging)')];
+                    
+                    let nextSibling = siblings.find(sibling => {
+                        const box = sibling.getBoundingClientRect();
+                        return e.clientY <= box.top + box.height / 2;
+                    });
+
+                    listEl.insertBefore(draggingCard, nextSibling);
+                    
+                    events = [...listEl.querySelectorAll('.event-card')].map(c => events[c.dataset.index]);
+                });
+
+                listEl.appendChild(card);
+            });
+        }
+
+        function saveEvent() {
+            const titleInput = document.getElementById('inputTitle');
+            const dateInput = document.getElementById('inputDate');
+
+            if (!titleInput.value || !dateInput.value) {
+                alert('Please enter both a title and a date.');
+                return;
+            }
+
+            events.push({
+                id: Date.now().toString(),
+                title: titleInput.value,
+                date: dateInput.value
+            });
+
+            saveToStorage();
+            renderEvents();
+
+            titleInput.value = '';
+            dateInput.value = '';
+            toggleForm();
+        }
+
+        function deleteEvent(id) {
+            events = events.filter(ev => ev.id !== id);
+            saveToStorage();
+            renderEvents();
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        renderEvents();
+    </script>
 </body>
 </html>
