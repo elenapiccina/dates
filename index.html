@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,7 +24,7 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 10px; /* Reduced outer padding */
         }
 
         .container {
@@ -36,11 +36,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 8px; /* Tighter header spacing */
         }
 
         h3 {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             letter-spacing: 0.08em;
             color: var(--text-muted);
@@ -52,9 +52,9 @@
             background: var(--text-main);
             color: #FFFFFF;
             border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
             cursor: pointer;
             transition: opacity 0.2s;
         }
@@ -67,9 +67,9 @@
         .event-form {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
             display: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
@@ -77,7 +77,7 @@
         .event-form.active {
             display: grid;
             grid-template-columns: 2fr 1.2fr auto;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
@@ -88,21 +88,21 @@
         }
 
         .event-form input {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 4px;
+            font-size: 12px;
             outline: none;
             background: var(--bg-color);
             color: var(--text-main);
         }
 
         .event-form button {
-            padding: 8px 14px;
+            padding: 6px 12px;
             background: #B8D6CD;
             border: none;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 4px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             color: var(--text-main);
@@ -112,17 +112,17 @@
         .events-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px; /* Tighter space between tasks */
         }
 
         .event-card {
             background: var(--card-bg);
-            border-radius: 10px;
-            padding: 14px 18px;
+            border-radius: 8px;
+            padding: 8px 14px; /* Slimmer vertical padding */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border-color);
             cursor: grab;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -140,36 +140,37 @@
         .event-info {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .drag-handle {
-            color: #ccc;
-            font-size: 16px;
+            color: #ddd;
+            font-size: 14px;
             user-select: none;
         }
 
         .event-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
+            line-height: 1.2;
         }
 
         .event-date {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .event-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .countdown-badge {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
-            padding: 5px 12px;
+            padding: 3px 8px;
             border-radius: 20px;
             white-space: nowrap;
             color: var(--text-main);
@@ -187,7 +188,7 @@
             color: #ccc;
             cursor: pointer;
             font-size: 14px;
-            padding: 4px;
+            padding: 2px 4px;
             transition: color 0.2s;
         }
 
@@ -197,11 +198,11 @@
 
         .empty-state {
             text-align: center;
-            padding: 30px;
+            padding: 20px;
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 12px;
             background: var(--card-bg);
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
         }
     </style>
@@ -211,14 +212,14 @@
     <div class="container">
         <div class="header-row">
             <h3>Upcoming Focus & Dates</h3>
-            <button class="btn-add" onclick="toggleForm()">+ Add Event</button>
+            <button class="btn-add" onclick="toggleForm()">+ Add</button>
         </div>
 
         <!-- Add Event Form -->
         <div class="event-form" id="eventForm">
-            <input type="text" id="inputTitle" placeholder="Event title (e.g., Flight, Meeting)">
+            <input type="text" id="inputTitle" placeholder="Event title">
             <input type="date" id="inputDate">
-            <button onclick="saveEvent()">Save Event</button>
+            <button onclick="saveEvent()">Save</button>
         </div>
 
         <!-- Events List Container -->
@@ -252,9 +253,9 @@
             if (diffDays < 0) return { text: 'Passed', class: 'badge-tier-future' };
             if (diffDays === 0) return { text: 'Today', class: 'badge-tier-urgent' };
             if (diffDays === 1) return { text: 'Tomorrow', class: 'badge-tier-urgent' };
-            if (diffDays <= 3) return { text: `In ${diffDays} days`, class: 'badge-tier-soon' };
-            if (diffDays <= 7) return { text: `In ${diffDays} days`, class: 'badge-tier-week' };
-            return { text: `In ${diffDays} days`, class: 'badge-tier-future' };
+            if (diffDays <= 3) return { text: `In ${diffDays}d`, class: 'badge-tier-soon' };
+            if (diffDays <= 7) return { text: `In ${diffDays}d`, class: 'badge-tier-week' };
+            return { text: `In ${diffDays}d`, class: 'badge-tier-future' };
         }
 
         function formatDateReadable(dateString) {
@@ -268,7 +269,7 @@
             listEl.innerHTML = '';
 
             if (events.length === 0) {
-                listEl.innerHTML = `<div class="empty-state">No upcoming events. Click "+ Add Event" to create one.</div>`;
+                listEl.innerHTML = `<div class="empty-state">No upcoming events. Click "+ Add" to create one.</div>`;
                 return;
             }
 
