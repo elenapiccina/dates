@@ -1,16 +1,16 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upcoming Focus & Dates</title>
-    <!-- Alice & Fine Serif Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Alice&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+    <!-- Alice Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Alice&display=swap" rel="stylesheet">
     <style>
         :root {
             --text-main: #2D2623;
             --text-muted: #8C807B;
-            --card-bg: #FAF6F0; /* Warm Aesthetic Cream */
+            --card-bg: #FAF6F0; /* Cream */
             --card-border: #EFE7DE;
             
             /* Glass Badge Tiers */
@@ -29,10 +29,11 @@
         }
 
         body {
-            font-family: 'Alice', 'Cormorant Garamond', Georgia, serif;
-            background-color: transparent; /* Cuts extra background space */
+            font-family: 'Alice', Georgia, serif;
+            font-weight: 400;
+            background-color: transparent;
             color: var(--text-main);
-            padding: 32px 0 0 0; /* Top padding clears Notion's top hover overlay bar */
+            padding: 32px 0 0 0; /* Clears Notion's top overlay bar entirely */
             margin: 0;
             width: 100%;
         }
@@ -47,13 +48,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding-right: 120px; /* Shifted left so Notion top-right icons never block click */
+            margin-bottom: 6px;
+            padding-right: 120px; /* Safe distance so Notion's top-right buttons never block "+ Add" */
         }
 
         h3 {
             font-family: 'Alice', Georgia, serif;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
             font-weight: 400;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -65,13 +66,14 @@
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             color: var(--text-main);
-            padding: 3px 12px;
-            border-radius: 12px;
+            padding: 2px 10px;
+            border-radius: 10px;
             font-family: 'Alice', Georgia, serif;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            position: relative;
+            z-index: 10;
         }
 
         .btn-add:hover {
@@ -79,16 +81,16 @@
             border-color: #DDD4C8;
         }
 
-        /* Form Controls */
+        /* Compact Form Controls */
         .event-form {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 8px 12px;
-            margin-bottom: 8px;
+            border-radius: 10px;
+            padding: 6px 10px;
+            margin-bottom: 6px;
             display: none;
             grid-template-columns: 2fr 1.2fr auto;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
         }
 
@@ -97,50 +99,49 @@
         }
 
         .event-form input {
-            padding: 4px 8px;
+            padding: 3px 6px;
             border: 1px solid var(--card-border);
-            border-radius: 6px;
+            border-radius: 5px;
             font-family: 'Alice', Georgia, serif;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             outline: none;
             background: #ffffff;
             color: var(--text-main);
         }
 
         .event-form button {
-            padding: 4px 10px;
+            padding: 3px 8px;
             background: #E58CA3;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             font-family: 'Alice', Georgia, serif;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: white;
             cursor: pointer;
         }
 
-        /* Minimal Card List */
+        /* Tighter Card List */
         .events-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
         }
 
         .event-card {
             background: var(--card-bg);
-            border-radius: 14px;
-            padding: 10px 14px;
+            border-radius: 10px;
+            padding: 5px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid var(--card-border);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
             cursor: grab;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.15s ease;
         }
 
         .event-card:hover {
             transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
         }
 
         .event-card.dragging {
@@ -150,13 +151,13 @@
         .event-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             flex-grow: 1;
         }
 
         .drag-handle {
             color: rgba(180, 168, 160, 0.6);
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: -1px;
             cursor: grab;
         }
@@ -164,31 +165,46 @@
         .event-text-group {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 1px;
+            flex-grow: 1;
         }
 
-        .event-title {
+        /* Editable Title Input */
+        .title-input {
             font-family: 'Alice', Georgia, serif;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             font-weight: 400;
             color: var(--text-main);
+            background: transparent;
+            border: none;
             outline: none;
-            line-height: 1.25;
-            letter-spacing: 0.01em;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            user-select: text;
         }
 
+        .title-input:focus {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 3px;
+        }
+
+        /* Formatted Date Display with Overlay Date Picker */
         .event-date-wrapper {
             position: relative;
             display: inline-flex;
             align-items: center;
+            cursor: pointer;
+            width: fit-content;
         }
 
         .event-date-display {
             font-family: 'Alice', Georgia, serif;
-            font-size: 0.82rem;
+            font-size: 0.76rem;
             font-weight: 400;
             color: var(--text-muted);
             letter-spacing: 0.01em;
+            pointer-events: none;
         }
 
         .event-date-picker {
@@ -199,21 +215,23 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+            border: none;
+            background: transparent;
         }
 
         .event-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         /* Glass Badges */
         .countdown-badge {
             font-family: 'Alice', Georgia, serif;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 400;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 1px 7px;
+            border-radius: 8px;
             white-space: nowrap;
             color: var(--text-main);
             border: 1px solid rgba(255, 255, 255, 0.8);
@@ -229,7 +247,7 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.3;
             transition: opacity 0.2s ease;
             padding: 0 2px;
@@ -242,11 +260,11 @@
 
         .empty-state {
             text-align: center;
-            padding: 14px;
+            padding: 10px;
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             background: var(--card-bg);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid var(--card-border);
         }
     </style>
@@ -269,14 +287,14 @@
     </div>
 
     <script>
-        let events = JSON.parse(localStorage.getItem('notion_cream_thin_dates')) || [
+        let events = JSON.parse(localStorage.getItem('notion_cream_formatted_dates')) || [
             { id: '1', title: 'Project Deadline', date: '2026-10-12' },
             { id: '2', title: 'Flight to Istanbul', date: '2026-10-25' },
             { id: '3', title: 'readingg', date: '2026-09-16' }
         ];
 
         function saveToStorage() {
-            localStorage.setItem('notion_cream_thin_dates', JSON.stringify(events));
+            localStorage.setItem('notion_cream_formatted_dates', JSON.stringify(events));
         }
 
         function toggleForm() {
@@ -341,7 +359,7 @@
                     <div class="event-info">
                         <span class="drag-handle">⋮⋮</span>
                         <div class="event-text-group">
-                            <div class="event-title" contenteditable="true" onblur="updateTitle('${ev.id}', this.innerText)">${escapeHtml(ev.title)}</div>
+                            <input type="text" class="title-input" value="${escapeHtml(ev.title)}" onchange="updateTitle('${ev.id}', this.value)" />
                             <div class="event-date-wrapper">
                                 <span class="event-date-display">${formattedDate}</span>
                                 <input type="date" class="event-date-picker" value="${ev.date}" onchange="updateDate('${ev.id}', this.value)" />
