@@ -1,209 +1,256 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aesthetic Upcoming Events</title>
+    <title>Upcoming Focus & Dates</title>
+    <!-- Alice & Fine Serif Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Alice&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #FAFAFA;
+            --text-main: #231F20;
+            --text-muted: #8C828A;
             --card-bg: #FFFFFF;
-            --text-main: #2C2C2C;
-            --text-muted: #888888;
-            --border-color: rgba(0, 0, 0, 0.06);
+            --card-border: rgba(230, 225, 228, 0.8);
+            
+            /* Glass Badge Tiers */
+            --badge-future: rgba(245, 245, 248, 0.85);
+            --badge-week: rgba(220, 240, 230, 0.85);
+            --badge-soon: rgba(254, 236, 210, 0.85);
+            --badge-urgent: rgba(252, 218, 224, 0.9);
+        }
 
-            /* Tiered Countdown Colors */
-            --badge-future: #EFEFEF;  /* 8+ days */
-            --badge-week: #B8D6CD;    /* 4-7 days (Sage) */
-            --badge-soon: #F3D5A3;    /* 2-3 days (Amber) */
-            --badge-urgent: #E8C4B8;  /* Today / Tomorrow (Rose) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Alice', 'Cormorant Garamond', Georgia, serif;
+            background-color: transparent; /* Seamless fit with no extra background space */
             color: var(--text-main);
+            padding: 0;
             margin: 0;
-            padding: 10px; /* Reduced outer padding */
+            width: 100%;
         }
 
         .container {
-            max-width: 750px;
-            margin: 0 auto;
+            width: 100%;
+            padding: 0;
+            margin: 0;
         }
 
         .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px; /* Tighter header spacing */
+            margin-bottom: 10px;
+            padding-right: 28px; /* Offset for Notion block overlay controls */
         }
 
         h3 {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
+            font-family: 'Alice', Georgia, serif;
+            font-size: 0.82rem;
+            font-weight: 400;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
+            color: var(--text-muted);
             margin: 0;
         }
 
         .btn-add {
-            background: var(--text-main);
-            color: #FFFFFF;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-family: 'Alice', Georgia, serif;
+            font-size: 0.75rem;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s ease;
         }
 
         .btn-add:hover {
-            opacity: 0.85;
+            color: var(--text-main);
+            background: #ffffff;
+            border-color: #d0c8cd;
         }
 
-        /* Form Modal */
+        /* Form Controls */
         .event-form {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 8px 12px;
             margin-bottom: 8px;
             display: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            grid-template-columns: 2fr 1.2fr auto;
+            gap: 8px;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
         }
 
         .event-form.active {
             display: grid;
-            grid-template-columns: 2fr 1.2fr auto;
-            gap: 8px;
-            align-items: center;
-        }
-
-        @media(max-width: 600px) {
-            .event-form.active {
-                grid-template-columns: 1fr;
-            }
         }
 
         .event-form input {
-            padding: 6px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            font-family: 'Alice', Georgia, serif;
+            font-size: 0.85rem;
             outline: none;
-            background: var(--bg-color);
             color: var(--text-main);
         }
 
         .event-form button {
-            padding: 6px 12px;
-            background: #B8D6CD;
+            padding: 4px 10px;
+            background: rgba(229, 140, 163, 0.85);
             border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
+            border-radius: 6px;
+            font-family: 'Alice', Georgia, serif;
+            font-size: 0.8rem;
+            color: white;
             cursor: pointer;
-            color: var(--text-main);
         }
 
-        /* List Layout */
+        /* Minimal Card List */
         .events-list {
             display: flex;
             flex-direction: column;
-            gap: 6px; /* Tighter space between tasks */
+            gap: 8px;
         }
 
         .event-card {
             background: var(--card-bg);
-            border-radius: 8px;
-            padding: 8px 14px; /* Slimmer vertical padding */
+            border-radius: 14px;
+            padding: 10px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
             cursor: grab;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .event-card:active {
-            cursor: grabbing;
+        .event-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
         }
 
         .event-card.dragging {
-            opacity: 0.4;
-            background: #f0f0f0;
+            opacity: 0.35;
         }
 
         .event-info {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-grow: 1;
         }
 
         .drag-handle {
-            color: #ddd;
-            font-size: 14px;
-            user-select: none;
+            color: rgba(180, 172, 178, 0.6);
+            font-size: 11px;
+            letter-spacing: -1px;
+            cursor: grab;
+        }
+
+        /* Delicate Thin Serif Typography */
+        .event-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
         .event-title {
-            font-size: 13px;
-            font-weight: 500;
-            line-height: 1.2;
+            font-family: 'Alice', Georgia, serif;
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: var(--text-main);
+            outline: none;
+            line-height: 1.25;
+            letter-spacing: 0.01em;
         }
 
-        .event-date {
-            font-size: 11px;
+        .event-date-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .event-date-display {
+            font-family: 'Alice', Georgia, serif;
+            font-size: 0.82rem;
+            font-weight: 400;
             color: var(--text-muted);
-            margin-top: 1px;
+            letter-spacing: 0.01em;
+        }
+
+        .event-date-picker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
         }
 
         .event-right {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
+        /* Glass Badges */
         .countdown-badge {
-            font-size: 10px;
-            font-weight: 500;
-            padding: 3px 8px;
-            border-radius: 20px;
+            font-family: 'Alice', Georgia, serif;
+            font-size: 0.72rem;
+            font-weight: 400;
+            padding: 2px 8px;
+            border-radius: 10px;
             white-space: nowrap;
             color: var(--text-main);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
         }
 
-        /* Dynamic Badge Classes */
-        .badge-tier-future { background-color: var(--badge-future); color: #666; }
-        .badge-tier-week { background-color: var(--badge-week); }
-        .badge-tier-soon { background-color: var(--badge-soon); }
-        .badge-tier-urgent { background-color: var(--badge-urgent); font-weight: 600; }
+        .badge-tier-future { background-color: var(--badge-future); }
+        .badge-tier-week   { background-color: var(--badge-week); }
+        .badge-tier-soon   { background-color: var(--badge-soon); }
+        .badge-tier-urgent { background-color: var(--badge-urgent); }
 
         .btn-delete {
             background: none;
             border: none;
-            color: #ccc;
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 14px;
-            padding: 2px 4px;
-            transition: color 0.2s;
+            font-size: 12px;
+            opacity: 0.3;
+            transition: opacity 0.2s ease;
+            padding: 0 2px;
         }
 
         .btn-delete:hover {
-            color: #e57373;
+            opacity: 1;
+            color: #e85d75;
         }
 
         .empty-state {
             text-align: center;
-            padding: 20px;
+            padding: 14px;
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 0.85rem;
             background: var(--card-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
         }
     </style>
 </head>
@@ -211,29 +258,28 @@
 
     <div class="container">
         <div class="header-row">
-            <h3>Upcoming Focus & Dates</h3>
+            <h3>UPCOMING FOCUS & DATES</h3>
             <button class="btn-add" onclick="toggleForm()">+ Add</button>
         </div>
 
-        <!-- Add Event Form -->
         <div class="event-form" id="eventForm">
-            <input type="text" id="inputTitle" placeholder="Event title">
+            <input type="text" id="inputTitle" placeholder="Event title...">
             <input type="date" id="inputDate">
             <button onclick="saveEvent()">Save</button>
         </div>
 
-        <!-- Events List Container -->
         <div class="events-list" id="eventsList"></div>
     </div>
 
     <script>
-        let events = JSON.parse(localStorage.getItem('notion_events')) || [
+        let events = JSON.parse(localStorage.getItem('notion_alice_thin_dates')) || [
             { id: '1', title: 'Project Deadline', date: '2026-10-12' },
-            { id: '2', title: 'Flight to Istanbul', date: '2026-10-25' }
+            { id: '2', title: 'Flight to Istanbul', date: '2026-10-25' },
+            { id: '3', title: 'readingg', date: '2026-09-16' }
         ];
 
         function saveToStorage() {
-            localStorage.setItem('notion_events', JSON.stringify(events));
+            localStorage.setItem('notion_alice_thin_dates', JSON.stringify(events));
         }
 
         function toggleForm() {
@@ -241,7 +287,26 @@
             form.classList.toggle('active');
         }
 
+        /* Formats exact date matching image style: "Oct 12, 2026" / "Sep 16, 2026" */
+        function formatDateExact(dateString) {
+            if (!dateString) return '';
+            const parts = dateString.split('-');
+            if (parts.length !== 3) return dateString;
+            
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            
+            const monthNames = [
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            ];
+            
+            return `${monthNames[month]} ${day}, ${year}`;
+        }
+
         function getCountdownDetails(dateString) {
+            if (!dateString) return { text: '', class: 'badge-tier-future' };
             const today = new Date();
             today.setHours(0,0,0,0);
             const targetDate = new Date(dateString);
@@ -258,23 +323,18 @@
             return { text: `In ${diffDays}d`, class: 'badge-tier-future' };
         }
 
-        function formatDateReadable(dateString) {
-            const options = { month: 'short', day: 'numeric', year: 'numeric' };
-            const date = new Date(dateString);
-            return isNaN(date) ? dateString : date.toLocaleDateString('en-US', options);
-        }
-
         function renderEvents() {
             const listEl = document.getElementById('eventsList');
             listEl.innerHTML = '';
 
             if (events.length === 0) {
-                listEl.innerHTML = `<div class="empty-state">No upcoming events. Click "+ Add" to create one.</div>`;
+                listEl.innerHTML = `<div class="empty-state">No upcoming dates. Click "+ Add" to create one.</div>`;
                 return;
             }
 
             events.forEach((ev, index) => {
                 const countdown = getCountdownDetails(ev.date);
+                const formattedDate = formatDateExact(ev.date);
                 
                 const card = document.createElement('div');
                 card.className = 'event-card';
@@ -284,38 +344,24 @@
                 card.innerHTML = `
                     <div class="event-info">
                         <span class="drag-handle">⋮⋮</span>
-                        <div>
-                            <div class="event-title">${escapeHtml(ev.title)}</div>
-                            <div class="event-date">${formatDateReadable(ev.date)}</div>
+                        <div class="event-text-group">
+                            <div class="event-title" contenteditable="true" onblur="updateTitle('${ev.id}', this.innerText)">${escapeHtml(ev.title)}</div>
+                            <div class="event-date-wrapper">
+                                <span class="event-date-display">${formattedDate}</span>
+                                <input type="date" class="event-date-picker" value="${ev.date}" onchange="updateDate('${ev.id}', this.value)" />
+                            </div>
                         </div>
                     </div>
                     <div class="event-right">
                         <span class="countdown-badge ${countdown.class}">${countdown.text}</span>
-                        <button class="btn-delete" onclick="deleteEvent('${ev.id}')" title="Delete">×</button>
+                        <button class="btn-delete" onclick="deleteEvent('${ev.id}')" title="Delete">✕</button>
                     </div>
                 `;
 
-                // Drag and drop events
-                card.addEventListener('dragstart', () => card.classList.add('dragging'));
-                card.addEventListener('dragend', () => {
-                    card.classList.remove('dragging');
-                    saveToStorage();
-                });
-
-                card.addEventListener('dragover', e => {
-                    e.preventDefault();
-                    const draggingCard = document.querySelector('.dragging');
-                    const siblings = [...listEl.querySelectorAll('.event-card:not(.dragging)')];
-                    
-                    let nextSibling = siblings.find(sibling => {
-                        const box = sibling.getBoundingClientRect();
-                        return e.clientY <= box.top + box.height / 2;
-                    });
-
-                    listEl.insertBefore(draggingCard, nextSibling);
-                    
-                    events = [...listEl.querySelectorAll('.event-card')].map(c => events[c.dataset.index]);
-                });
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragend', handleDragEnd);
 
                 listEl.appendChild(card);
             });
@@ -325,14 +371,11 @@
             const titleInput = document.getElementById('inputTitle');
             const dateInput = document.getElementById('inputDate');
 
-            if (!titleInput.value || !dateInput.value) {
-                alert('Please enter both a title and a date.');
-                return;
-            }
+            if (!titleInput.value.trim() || !dateInput.value) return;
 
             events.push({
                 id: Date.now().toString(),
-                title: titleInput.value,
+                title: titleInput.value.trim(),
                 date: dateInput.value
             });
 
@@ -344,10 +387,57 @@
             toggleForm();
         }
 
+        function updateTitle(id, newTitle) {
+            const item = events.find(e => e.id === id);
+            if (item) {
+                item.title = newTitle.trim() || 'Untitled Event';
+                saveToStorage();
+            }
+        }
+
+        function updateDate(id, newDate) {
+            const item = events.find(e => e.id === id);
+            if (item) {
+                item.date = newDate;
+                saveToStorage();
+                renderEvents();
+            }
+        }
+
         function deleteEvent(id) {
             events = events.filter(ev => ev.id !== id);
             saveToStorage();
             renderEvents();
+        }
+
+        let draggedIndex = null;
+
+        function handleDragStart(e) {
+            draggedIndex = +this.dataset.index;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetIndex = +this.dataset.index;
+            if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+            const draggedItem = events.splice(draggedIndex, 1)[0];
+            events.splice(targetIndex, 0, draggedItem);
+
+            saveToStorage();
+            renderEvents();
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedIndex = null;
         }
 
         function escapeHtml(text) {
